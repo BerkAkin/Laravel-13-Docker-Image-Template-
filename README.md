@@ -2,7 +2,7 @@
 
 *A Docker-based development environment designed for modern Laravel applications.*
 
-## Amaç
+## Purpose
 
 **This template aims to provide a fast and repeatable development environment by bringing together the essential services needed in the Laravel development process under a single Docker Compose structure.**
 
