@@ -1,0 +1,74 @@
+services:
+  laravel:
+    container_name: App_Laravel
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - laranet
+    volumes:
+      - ./src:/var/www
+      - vendor:/var/www/vendor
+      - node_modules:/var/www/node_modules
+    depends_on:
+      - mysql
+
+  vite:
+    container_name: App_Vite
+    image: node:22
+    ports:
+      - "5173:5173"
+    working_dir: /var/www
+    volumes:
+      - ./src:/var/www
+      - node_modules:/var/www/node_modules
+    command: sh -c "npm install && npm run dev"
+    networks:
+      - laranet
+
+  mysql:
+    container_name: App_MySql
+    image: mysql:8
+    ports:
+      - "3306:3306"
+    networks:
+      - laranet
+    volumes:
+      - mysql:/var/lib/mysql
+    environment:
+      MYSQL_PASSWORD: root
+      MYSQL_USER: app
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: laraDB
+
+  nginx:
+    container_name: App_NginX
+    image: nginx:stable
+    ports:
+      - "80:80"
+    networks:
+      - laranet
+    volumes:
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+      - ./src:/var/www
+    depends_on:
+      - laravel
+
+  redis:
+    container_name: App_Redis
+    image: redis:8
+    ports:
+      - "6379:6379"
+    networks:
+      - laranet
+    volumes:
+      - redis_data:/data
+
+volumes:
+  mysql:
+  vendor:
+  node_modules:
+  redis_data:
+
+networks:
+  laranet:
